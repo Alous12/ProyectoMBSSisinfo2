@@ -1500,6 +1500,20 @@
 								"type": "DatasetReference"
 							},
 							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "BRONZE_sql_Clientes_MBS",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						},
+						{
+							"dataset": {
+								"referenceName": "BRONZE_sql_Clientes_location_MBS",
+								"type": "DatasetReference"
+							},
+							"name": "source3"
 						}
 					],
 					"sinks": [
@@ -1511,7 +1525,23 @@
 							"name": "sink1"
 						}
 					],
-					"transformations": [],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn2"
+						}
+					],
 					"scriptLines": [
 						"source(output(",
 						"          CID as string,",
@@ -1522,7 +1552,54 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> source1",
-						"source1 sink(allowSchemaDrift: true,",
+						"source(output(",
+						"          cst_id as integer,",
+						"          cst_key as string,",
+						"          cst_firstname as string,",
+						"          cst_lastname as string,",
+						"          cst_marital_status as string,",
+						"          cst_gndr as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
+						"source(output(",
+						"          CID as string,",
+						"          CNTRY as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source3",
+						"source2, source1 join(cst_key == iif(startsWith(CID, 'NAS'), substring(CID, 4),CID)\r",
+						",",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"source3 derive(CID = replace(CID, '-', '')) ~> derivedColumn1",
+						"derivedColumn1, join1 join(derivedColumn1@CID == cst_key,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"derivedColumn2 select(mapColumn(",
+						"          CNTRY,",
+						"          cst_id,",
+						"          cst_key,",
+						"          cst_marital_status,",
+						"          BDATE,",
+						"          fullname,",
+						"          Gender",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"join2 derive(fullname = trim(cst_firstname) + ' ' + trim(cst_lastname)\r",
+						",",
+						"          Gender = iif(isNull(GEN), cst_gndr, GEN)\r",
+						") ~> derivedColumn2",
+						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          cst_id as integer,",
@@ -1540,12 +1617,23 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          cst_id,",
+						"          cst_key,",
+						"          fullname,",
+						"          marital_status = cst_marital_status,",
+						"          gender = Gender,",
+						"          Birth_Date = BDATE,",
+						"          country = CNTRY",
+						"     )) ~> sink1"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Clientes_bd_MBS')]",
+				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Clientes_MBS')]",
+				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Clientes_location_MBS')]",
 				"[concat(variables('factoryId'), '/datasets/SILVER_sql_Datos_Clientes')]"
 			]
 		},

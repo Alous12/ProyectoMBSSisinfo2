@@ -1,0 +1,28 @@
+{
+	"name": "BRONZE_sql_Clientes_location_MBS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_mountain_bike_store",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "BRONZE"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "CID",
+				"type": "varchar"
+			},
+			{
+				"name": "CNTRY",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "BRONZE",
+			"table": "CLIENTES_LOC"
+		}
+	}
+}

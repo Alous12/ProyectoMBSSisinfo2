@@ -83,6 +83,43 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/BRONZE_sql_Clientes_bd_MBS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_dw_mountain_bike_store",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "BRONZE"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CID",
+						"type": "varchar"
+					},
+					{
+						"name": "BDATE",
+						"type": "date"
+					},
+					{
+						"name": "GEN",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "BRONZE",
+					"table": "CLIENTES_BD"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sql_dw_mountain_bike_store')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Clientes_MBS_csv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -130,6 +167,50 @@
 					},
 					{
 						"name": "cst_gndr",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sa_MBS_raw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Clientes_bd_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sa_MBS_raw",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "BRONZE"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Clientes_BD-GEN.csv",
+						"container": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CID",
+						"type": "String"
+					},
+					{
+						"name": "BDATE",
+						"type": "String"
+					},
+					{
+						"name": "GEN",
 						"type": "String"
 					}
 				]

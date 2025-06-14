@@ -248,8 +248,7 @@
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> source3",
-						"source2, source1 join(cst_key == iif(startsWith(CID, 'NAS'), substring(CID, 4),CID)\r",
-						",",
+						"source2, source1 join(cst_key == iif(startsWith(CID, 'NAS'), substring(CID, 4),CID),",
 						"     joinType:'cross',",
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
@@ -271,10 +270,8 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select1",
-						"join2 derive(fullname = trim(cst_firstname) + ' ' + trim(cst_lastname)\r",
-						",",
-						"          Gender = iif(isNull(GEN), cst_gndr, GEN)\r",
-						") ~> derivedColumn2",
+						"join2 derive(fullname = trim(cst_firstname) + ' ' + trim(cst_lastname),",
+						"          Gender = iif(isNull(GEN), cst_gndr, GEN)) ~> derivedColumn2",
 						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -389,8 +386,7 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'off')~> join1",
-						"join1 derive(MAINTENANCE = iif(MAINTENANCE == 'Yes', 1, 0)\r",
-						",",
+						"join1 derive(MAINTENANCE = iif(MAINTENANCE == 'Yes', 1, 0),",
 						"          prd_cost = iif(isNull(prd_cost), 0, toInteger(prd_cost))) ~> mantenimiento",
 						"mantenimiento select(mapColumn(",
 						"          prd_id,",
@@ -440,7 +436,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Clientes_MBS')]",
+			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Clientes_BD_MBS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -459,7 +455,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "BRONZE_df_Clientes_MBS",
+								"referenceName": "BRONZE_df_Clientes_db_MBS",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -488,7 +484,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Clientes_BD_MBS')]",
+			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Clientes_MBS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -507,7 +503,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "BRONZE_df_Clientes_db_MBS",
+								"referenceName": "BRONZE_df_Clientes_MBS",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -634,6 +630,54 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Productos_Cat_Mant_MBS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "BRONZE_df_Productos_Cat_MBS",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine",
+							"continueOnError": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "BRONZE"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Productos_MBS')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -684,7 +728,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/BRONZE_PL_Productos_Cat_Mant_MBS')]",
+			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Clientes')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -703,11 +747,13 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "BRONZE_df_Productos_Cat_MBS",
+								"referenceName": "SILVER_df_Datos_Clientes",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
 									"source1": {},
+									"source2": {},
+									"source3": {},
 									"sink1": {}
 								}
 							},
@@ -716,8 +762,7 @@
 								"coreCount": 8,
 								"computeType": "General"
 							},
-							"traceLevel": "Fine",
-							"continueOnError": true
+							"traceLevel": "Fine"
 						}
 					}
 				],
@@ -725,11 +770,63 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "BRONZE"
+					"name": "SILVER"
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Clientes')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Productos')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SILVER_df_Datos_Productos",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source2": {},
+									"source3": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Productos')]"
+			]
 		}
 	]
 }

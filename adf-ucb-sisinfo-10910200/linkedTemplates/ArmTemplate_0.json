@@ -698,6 +698,88 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_sql_Datos_Prodcutos_Vendidos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_dw_mountain_bike_store",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "prd_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "prd_key",
+						"type": "varchar"
+					},
+					{
+						"name": "prd_nombre",
+						"type": "varchar"
+					},
+					{
+						"name": "prd_cost",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "linea",
+						"type": "varchar"
+					},
+					{
+						"name": "categoria",
+						"type": "varchar"
+					},
+					{
+						"name": "subcategoria",
+						"type": "varchar"
+					},
+					{
+						"name": "mantenimiento",
+						"type": "bit"
+					},
+					{
+						"name": "cantidad_total",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ventas_totales",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "precio_promedio",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "veces_vendido",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "SILVER",
+					"table": "DATOS_PRODUCTOS_VENDIDOS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sql_dw_mountain_bike_store')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SILVER_sql_Datos_Productos')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -959,75 +1041,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Clientes_location_csv')]",
 				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Clientes_location_MBS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/BRONZE_df_Productos_Cat_MBS')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"folder": {
-					"name": "BRONZE"
-				},
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Productos_Cat_Man_csv",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "BRONZE_sql_Productos_Cat_MBS",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"scriptLines": [
-						"source(output(",
-						"          ID as string,",
-						"          CAT as string,",
-						"          SUBCAT as string,",
-						"          MAINTENANCE as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> source1",
-						"source1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          ID as string,",
-						"          CAT as string,",
-						"          SUBCAT as string,",
-						"          MAINTENANCE as string",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          ID,",
-						"          CAT,",
-						"          SUBCAT,",
-						"          MAINTENANCE",
-						"     )) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Productos_Cat_Man_csv')]",
-				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Productos_Cat_MBS')]"
 			]
 		}
 	]

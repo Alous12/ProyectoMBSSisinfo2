@@ -333,6 +333,107 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Clientes')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SILVER_df_Datos_Clientes",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"source3": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Clientes')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Productos')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SILVER_df_Datos_Productos",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source2": {},
+									"source3": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Productos')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/BRONZE_sql_Clientes_MBS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -956,6 +1057,88 @@
 				"typeProperties": {
 					"schema": "SILVER",
 					"table": "DATOS_CLIENTES"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sql_dw_mountain_bike_store')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_sql_Datos_Prodcutos_Vendidos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_dw_mountain_bike_store",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "prd_id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "prd_key",
+						"type": "varchar"
+					},
+					{
+						"name": "prd_nombre",
+						"type": "varchar"
+					},
+					{
+						"name": "prd_cost",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 0
+					},
+					{
+						"name": "linea",
+						"type": "varchar"
+					},
+					{
+						"name": "categoria",
+						"type": "varchar"
+					},
+					{
+						"name": "subcategoria",
+						"type": "varchar"
+					},
+					{
+						"name": "mantenimiento",
+						"type": "bit"
+					},
+					{
+						"name": "cantidad_total",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ventas_totales",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "precio_promedio",
+						"type": "decimal",
+						"precision": 18,
+						"scale": 2
+					},
+					{
+						"name": "veces_vendido",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "SILVER",
+					"table": "DATOS_PRODUCTOS_VENDIDOS"
 				}
 			},
 			"dependsOn": [
@@ -1769,104 +1952,179 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Clientes')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/SILVER_df_Datos_Produtos_Vendidos')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "SILVER_df_Datos_Clientes",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"source2": {},
-									"source3": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
 				"folder": {
 					"name": "SILVER"
 				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Clientes')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SILVER_PL_Productos')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "BRONZE_sql_Productos_Cat_MBS",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
 						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "SILVER_df_Datos_Productos",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source2": {},
-									"source3": {},
-									"sink1": {}
-								}
+						{
+							"dataset": {
+								"referenceName": "BRONZE_sql_Detalles_ventas_MSB",
+								"type": "DatasetReference"
 							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
+							"name": "source2"
+						},
+						{
+							"dataset": {
+								"referenceName": "BRONZE_sql_Productos_MBS",
+								"type": "DatasetReference"
 							},
-							"traceLevel": "Fine"
+							"name": "source3"
 						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "SILVER"
-				},
-				"annotations": []
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SILVER_sql_Datos_Prodcutos_Vendidos",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          ID as string,",
+						"          CAT as string,",
+						"          SUBCAT as string,",
+						"          MAINTENANCE as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source(output(",
+						"          sls_ord_num as string,",
+						"          sls_prd_key as string,",
+						"          sls_cust_id as integer,",
+						"          sls_order_dt as string,",
+						"          sls_ship_dt as string,",
+						"          sls_sales as decimal(18,0),",
+						"          sls_quantity as integer,",
+						"          sls_price as decimal(18,0)",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
+						"source(output(",
+						"          prd_id as integer,",
+						"          prd_key as string,",
+						"          prd_nm as string,",
+						"          prd_cost as decimal(18,0),",
+						"          prd_line as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source3",
+						"source3 derive(prd_key = replace(prd_key, '-', '')) ~> derivedColumn1",
+						"source2 derive(sls_prd_key = replace(sls_prd_key, '-', '')) ~> derivedColumn2",
+						"source1 derive(ID = replace(ID, '_', '')) ~> derivedColumn3",
+						"derivedColumn1, derivedColumn3 join(startsWith(prd_key, ID),",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"derivedColumn2, join1 join(endsWith(prd_key, sls_prd_key),",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 derive(MAINTENANCE = iif(MAINTENANCE == 'Yes', 1, 0),",
+						"          prd_cost = iif(isNull(prd_cost), 0, toInteger(prd_cost))) ~> derivedColumn4",
+						"derivedColumn4 aggregate(groupBy(prd_key),",
+						"     cantidad_total = sum(sls_quantity),",
+						"          ventas_totales = sum(sls_sales),",
+						"          precio_promedio = avg(sls_price),",
+						"          veces_vendido = count(1),",
+						"          prd_id = first(prd_id),",
+						"          prd_nm = first(prd_nm),",
+						"          prd_cost = first(prd_cost),",
+						"          prd_line = first(prd_line),",
+						"          CAT = first(CAT),",
+						"          SUBCAT = first(SUBCAT),",
+						"          MAINTENANCE = first(MAINTENANCE)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          prd_id as integer,",
+						"          prd_key as string,",
+						"          prd_nombre as string,",
+						"          prd_cost as decimal(18,0),",
+						"          linea as string,",
+						"          categoria as string,",
+						"          subcategoria as string,",
+						"          mantenimiento as boolean,",
+						"          cantidad_total as integer,",
+						"          ventas_totales as decimal(18,2),",
+						"          precio_promedio as decimal(18,2),",
+						"          veces_vendido as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          prd_id,",
+						"          prd_key,",
+						"          prd_nombre = prd_nm,",
+						"          prd_cost,",
+						"          linea = prd_line,",
+						"          categoria = CAT,",
+						"          subcategoria = SUBCAT,",
+						"          mantenimiento = MAINTENANCE,",
+						"          cantidad_total,",
+						"          ventas_totales,",
+						"          precio_promedio,",
+						"          veces_vendido",
+						"     )) ~> sink1"
+					]
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Productos')]"
+				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Productos_Cat_MBS')]",
+				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Detalles_ventas_MSB')]",
+				"[concat(variables('factoryId'), '/datasets/BRONZE_sql_Productos_MBS')]",
+				"[concat(variables('factoryId'), '/datasets/SILVER_sql_Datos_Prodcutos_Vendidos')]"
 			]
 		}
 	]

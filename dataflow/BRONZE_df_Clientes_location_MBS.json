@@ -1,6 +1,9 @@
 {
 	"name": "BRONZE_df_Clientes_location_MBS",
 	"properties": {
+		"folder": {
+			"name": "BRONZE"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

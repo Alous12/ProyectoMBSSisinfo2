@@ -1,6 +1,9 @@
 {
 	"name": "BRONZE_df_Productos_Cat_MBS",
 	"properties": {
+		"folder": {
+			"name": "BRONZE"
+		},
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

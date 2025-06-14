@@ -235,10 +235,17 @@
 					"sources": [
 						{
 							"dataset": {
+								"referenceName": "BRONZE_sql_Productos_MBS",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						},
+						{
+							"dataset": {
 								"referenceName": "BRONZE_sql_Productos_Cat_MBS",
 								"type": "DatasetReference"
 							},
-							"name": "source1"
+							"name": "source3"
 						}
 					],
 					"sinks": [
@@ -250,8 +257,35 @@
 							"name": "sink1"
 						}
 					],
-					"transformations": [],
+					"transformations": [
+						{
+							"name": "LimpiarProductos"
+						},
+						{
+							"name": "LimpiarProductosCat"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "mantenimiento"
+						},
+						{
+							"name": "select1"
+						}
+					],
 					"scriptLines": [
+						"source(output(",
+						"          prd_id as integer,",
+						"          prd_key as string,",
+						"          prd_nm as string,",
+						"          prd_cost as decimal(18,0),",
+						"          prd_line as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
 						"source(output(",
 						"          ID as string,",
 						"          CAT as string,",
@@ -261,8 +295,30 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source1",
-						"source1 sink(allowSchemaDrift: true,",
+						"     format: 'table') ~> source3",
+						"source2 derive(prd_key = replace(prd_key, '-', '')) ~> LimpiarProductos",
+						"source3 derive(ID = replace(ID, '_', '')) ~> LimpiarProductosCat",
+						"LimpiarProductos, LimpiarProductosCat join(startsWith(prd_key, ID),",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'off')~> join1",
+						"join1 derive(MAINTENANCE = iif(MAINTENANCE == 'Yes', 1, 0)\r",
+						",",
+						"          prd_cost = iif(isNull(prd_cost), 0, toInteger(prd_cost))) ~> mantenimiento",
+						"mantenimiento select(mapColumn(",
+						"          prd_id,",
+						"          prd_key,",
+						"          prd_nm,",
+						"          prd_cost,",
+						"          prd_line,",
+						"          CAT,",
+						"          SUBCAT,",
+						"          MAINTENANCE",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
 						"          prd_id as integer,",
@@ -281,7 +337,17 @@
 						"     format: 'table',",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          prd_id,",
+						"          prd_key,",
+						"          prd_nombre = prd_nm,",
+						"          prd_cost,",
+						"          linea = prd_line,",
+						"          category = CAT,",
+						"          subcategory = SUBCAT,",
+						"          maintenance = MAINTENANCE",
+						"     )) ~> sink1"
 					]
 				}
 			},

@@ -1,0 +1,88 @@
+{
+	"name": "GOLD_df_DIM_Clientes_MBS",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SILVER_sql_Datos_Clientes",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "GOLD_sql_Clientes_MBS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          cst_id as integer,",
+				"          cst_key as string,",
+				"          fullname as string,",
+				"          marital_status as string,",
+				"          gender as string,",
+				"          Birth_Date as date,",
+				"          country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 select(mapColumn(",
+				"          cst_id,",
+				"          cst_key,",
+				"          fullname,",
+				"          marital_status,",
+				"          gender,",
+				"          Birth_Date,",
+				"          country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          cst_id as integer,",
+				"          cst_key as string,",
+				"          fullname as string,",
+				"          marital_status as string,",
+				"          gender as string,",
+				"          Birth_Date as date,",
+				"          country as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          cst_id,",
+				"          cst_key,",
+				"          fullname,",
+				"          marital_status,",
+				"          gender,",
+				"          Birth_Date,",
+				"          country",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

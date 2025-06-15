@@ -1,0 +1,49 @@
+{
+	"name": "GOLD_sql_Clientes_MBS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_mountain_bike_store",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "GOLD"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "cst_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "cst_key",
+				"type": "varchar"
+			},
+			{
+				"name": "fullname",
+				"type": "varchar"
+			},
+			{
+				"name": "marital_status",
+				"type": "varchar"
+			},
+			{
+				"name": "gender",
+				"type": "varchar"
+			},
+			{
+				"name": "Birth_Date",
+				"type": "date"
+			},
+			{
+				"name": "country",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD",
+			"table": "CLIENTES"
+		}
+	}
+}

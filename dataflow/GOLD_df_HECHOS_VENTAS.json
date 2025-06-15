@@ -1,0 +1,121 @@
+{
+	"name": "GOLD_df_HECHOS_VENTAS",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SILVER_sql_Datos_Productos_Ventas",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "SILVER_sql_Datos_Clientes",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "GOLD_sql_Hechos_Ventas_MBS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          prd_id as integer,",
+				"          prd_key as string,",
+				"          prd_nombre as string,",
+				"          prd_cost as decimal(18,0),",
+				"          categoria as string,",
+				"          subcategoria as string,",
+				"          fecha_venta as date,",
+				"          cantidad_total as integer,",
+				"          ventas_totales as decimal(18,2),",
+				"          precio_promedio as decimal(18,2),",
+				"          veces_vendido as integer,",
+				"          ID_CLIENTE as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          cst_id as integer,",
+				"          cst_key as string,",
+				"          fullname as string,",
+				"          marital_status as string,",
+				"          gender as string,",
+				"          Birth_Date as date,",
+				"          country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2",
+				"source1, source2 join(ID_CLIENTE == cst_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          prd_id,",
+				"          fecha_venta,",
+				"          cantidad_total,",
+				"          ventas_totales,",
+				"          precio_promedio,",
+				"          veces_vendido,",
+				"          cst_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          prd_id as integer,",
+				"          cst_id as integer,",
+				"          fecha_venta as date,",
+				"          cantidad_total as integer,",
+				"          ventas_totales as decimal(18,2),",
+				"          precio_promedio as decimal(18,2),",
+				"          veces_vendido as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          prd_id,",
+				"          cst_id,",
+				"          fecha_venta,",
+				"          cantidad_total,",
+				"          ventas_totales,",
+				"          precio_promedio,",
+				"          veces_vendido",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

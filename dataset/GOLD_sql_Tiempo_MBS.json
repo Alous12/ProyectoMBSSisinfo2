@@ -1,0 +1,34 @@
+{
+	"name": "GOLD_sql_Tiempo_MBS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_mountain_bike_store",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "GOLD"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "fecha_venta",
+				"type": "date"
+			},
+			{
+				"name": "anio",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "mes",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD",
+			"table": "TIEMPO"
+		}
+	}
+}

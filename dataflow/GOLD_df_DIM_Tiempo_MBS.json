@@ -1,0 +1,86 @@
+{
+	"name": "GOLD_df_DIM_Tiempo_MBS",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SILVER_sql_Datos_Productos_Ventas",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "GOLD_sql_Tiempo_MBS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          prd_id as integer,",
+				"          prd_key as string,",
+				"          prd_nombre as string,",
+				"          prd_cost as decimal(18,0),",
+				"          categoria as string,",
+				"          subcategoria as string,",
+				"          fecha_venta as date,",
+				"          cantidad_total as integer,",
+				"          ventas_totales as decimal(18,2),",
+				"          precio_promedio as decimal(18,2),",
+				"          veces_vendido as integer,",
+				"          ID_CLIENTE as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(Anio = year(fecha_venta),",
+				"          Mes = month(fecha_venta)) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          fecha_venta,",
+				"          Anio,",
+				"          Mes",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          fecha_venta as date,",
+				"          anio as integer,",
+				"          mes as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          fecha_venta,",
+				"          anio = Anio,",
+				"          mes = Mes",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

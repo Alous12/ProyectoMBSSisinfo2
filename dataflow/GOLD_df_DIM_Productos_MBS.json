@@ -1,0 +1,92 @@
+{
+	"name": "GOLD_df_DIM_Productos_MBS",
+	"properties": {
+		"folder": {
+			"name": "GOLD"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SILVER_sql_Datos_Productos",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "GOLD_sql_Productos_MBS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          prd_id as integer,",
+				"          prd_key as string,",
+				"          prd_nombre as string,",
+				"          prd_cost as decimal(18,0),",
+				"          linea as string,",
+				"          category as string,",
+				"          subcategory as string,",
+				"          maintenance as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 select(mapColumn(",
+				"          prd_id,",
+				"          prd_key,",
+				"          prd_nombre,",
+				"          prd_cost,",
+				"          linea,",
+				"          category,",
+				"          subcategory,",
+				"          maintenance",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          prd_id as integer,",
+				"          prd_key as string,",
+				"          prd_nombre as string,",
+				"          prd_cost as decimal(18,0),",
+				"          linea as string,",
+				"          category as string,",
+				"          subcategory as string,",
+				"          maintenance as boolean",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          prd_id,",
+				"          prd_key,",
+				"          prd_nombre,",
+				"          prd_cost,",
+				"          linea,",
+				"          category,",
+				"          subcategory,",
+				"          maintenance",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,56 @@
+{
+	"name": "GOLD_sql_Hechos_Ventas_MBS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_mountain_bike_store",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "GOLD"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "prd_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "cst_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha_venta",
+				"type": "date"
+			},
+			{
+				"name": "cantidad_total",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ventas_totales",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "precio_promedio",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "veces_vendido",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "GOLD",
+			"table": "HECHOS_VENTAS"
+		}
+	}
+}

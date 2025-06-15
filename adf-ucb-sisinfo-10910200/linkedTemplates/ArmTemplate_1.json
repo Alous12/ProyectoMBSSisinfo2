@@ -537,7 +537,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "SILVER_sql_Datos_Prodcutos_Vendidos",
+								"referenceName": "SILVER_sql_Datos_Productos_Vendidos",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -615,8 +615,8 @@
 						"     matchType:'exact',",
 						"     ignoreSpaces: false,",
 						"     broadcast: 'auto')~> join2",
-						"join2 derive(MAINTENANCE = iif(MAINTENANCE == 'Yes', 1, 0),",
-						"          prd_cost = iif(isNull(prd_cost), 0, toInteger(prd_cost))) ~> derivedColumn4",
+						"join2 derive(prd_cost = iif(isNull(prd_cost), 0, toInteger(prd_cost)),",
+						"          fecha_venta = toDate((sls_order_dt), 'yyyyMMdd')) ~> derivedColumn4",
 						"derivedColumn4 aggregate(groupBy(prd_key),",
 						"     cantidad_total = sum(sls_quantity),",
 						"          ventas_totales = sum(sls_sales),",
@@ -625,10 +625,9 @@
 						"          prd_id = first(prd_id),",
 						"          prd_nm = first(prd_nm),",
 						"          prd_cost = first(prd_cost),",
-						"          prd_line = first(prd_line),",
 						"          CAT = first(CAT),",
 						"          SUBCAT = first(SUBCAT),",
-						"          MAINTENANCE = first(MAINTENANCE)) ~> aggregate1",
+						"          fecha_venta = first(fecha_venta)) ~> aggregate1",
 						"aggregate1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     input(",
@@ -636,10 +635,9 @@
 						"          prd_key as string,",
 						"          prd_nombre as string,",
 						"          prd_cost as decimal(18,0),",
-						"          linea as string,",
 						"          categoria as string,",
 						"          subcategoria as string,",
-						"          mantenimiento as boolean,",
+						"          fecha_venta as date,",
 						"          cantidad_total as integer,",
 						"          ventas_totales as decimal(18,2),",
 						"          precio_promedio as decimal(18,2),",
@@ -658,10 +656,9 @@
 						"          prd_key,",
 						"          prd_nombre = prd_nm,",
 						"          prd_cost,",
-						"          linea = prd_line,",
 						"          categoria = CAT,",
 						"          subcategoria = SUBCAT,",
-						"          mantenimiento = MAINTENANCE,",
+						"          fecha_venta,",
 						"          cantidad_total,",
 						"          ventas_totales,",
 						"          precio_promedio,",
@@ -1065,6 +1062,58 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Productos')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SILVER_PL_DATOS_PRODUCTOS_VENDIDOS')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SILVER_df_Datos_Produtos_Vendidos",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"source2": {},
+									"source3": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine",
+							"continueOnError": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "SILVER"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SILVER_df_Datos_Produtos_Vendidos')]"
 			]
 		}
 	]

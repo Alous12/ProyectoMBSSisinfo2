@@ -1,0 +1,73 @@
+{
+	"name": "SILVER_sql_Datos_Productos_Vendidos",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_dw_mountain_bike_store",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "SILVER"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "prd_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "prd_key",
+				"type": "varchar"
+			},
+			{
+				"name": "prd_nombre",
+				"type": "varchar"
+			},
+			{
+				"name": "prd_cost",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 0
+			},
+			{
+				"name": "categoria",
+				"type": "varchar"
+			},
+			{
+				"name": "subcategoria",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha_venta",
+				"type": "date"
+			},
+			{
+				"name": "cantidad_total",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ventas_totales",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "precio_promedio",
+				"type": "decimal",
+				"precision": 18,
+				"scale": 2
+			},
+			{
+				"name": "veces_vendido",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "SILVER",
+			"table": "DATOS_PRODUCTOS_VENDIDOS"
+		}
+	}
+}
